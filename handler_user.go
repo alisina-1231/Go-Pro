@@ -2,24 +2,24 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/bootdotdev/projects/apikey/internal/auth"
-	"github.com/bootdotdev/projects/apikey/internal/database"
+	"github.com/alisina-1231/Go-Pro/internal/database"
 	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name string
+		Name string `json:"name"`
 	}
+
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+	if err := decoder.Decode(&params); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 		return
 	}
 
@@ -35,21 +35,35 @@ func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
+	respondWithJson(w, http.StatusOK, databaseUserToUser(user))
 }
 
-func (cfg *apiConfig) handlerUsersGet(w http.ResponseWriter, r *http.Request) {
-	apiKey, err := auth.GetAPIKey(r.Header)
+func (cfg *apiConfig) handlerUsersGet(
+	w http.ResponseWriter,
+	r *http.Request,
+	user database.User,
+) {
+	respondWithJson(w, http.StatusOK, databaseUserToUser(user))
+}
+
+func (cfg *apiConfig) handlerGetPostsForUser(
+	w http.ResponseWriter,
+	r *http.Request,
+	user database.User,
+) {
+	posts, err := cfg.DB.GetPostsForUser(
+		r.Context(),
+		database.GetPostsForUserParams{
+			UserID: user_id.ID,
+			Limit:  10,
+		},
+	)
 	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, "Couldn't find api key")
+		respondWithError(w, http.StatusInternalServerError,
+			fmt.Sprintf("Couldn't get posts: %v", err))
 		return
 	}
 
-	user, err := cfg.DB.GetUserByAPIKey(r.Context(), apiKey)
-	if err != nil {
-		respondWithError(w, http.StatusNotFound, "Couldn't get user")
-		return
-	}
-
-	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
+	respondWithJson(w, http.StatusOK, databasePostsToPosts(posts))
 }
+
