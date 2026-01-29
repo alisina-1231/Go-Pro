@@ -5,6 +5,6 @@ import (
 )
 
 func handlerErr(w http.ResponseWriter, r *http.Request) {
-	respodWithJSON(w, 400, "Something went wrong")
+	respondWithJson(w, 400, "Something went wrong")
 }
 
