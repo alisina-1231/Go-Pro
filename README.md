@@ -1,27 +1,29 @@
 # Go-Pro
-# Go-Pro
 
-A Go-based project for [brief description, e.g., API server, file handling, etc.].
-This project demonstrates [key features, e.g., HTTP handling, file processing, Go best practices].
+A REST API backend for a social feed app built in Go.
+
+Users can register, log in, and view feeds. The project demonstrates Go best practices, HTTP handling, authentication, and modular code organization.
 
 ## Features
 
-* Feature 1: [e.g., REST API endpoints]
-* Feature 2: [e.g., File reading and writing]
-* Feature 3: [e.g., Logging and error handling]
+* User registration and authentication (JWT-based)
+* Feed management: view and interact with posts
+* Middleware for authentication and request handling
+* Structured logging and error handling
+* Modular design with `internal` packages for auth and database
 
 ## Prerequisites
 
 * Go >= 1.20 installed
 * Git
-* [Optional] Any database or external services
+* Optional: Database (PostgreSQL/MySQL) configuration
 
 ## Installation
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Go-Pro.git
+git clone https://github.com/alisina-1231/Go-Pro.git
 cd Go-Pro
 ```
 
@@ -43,23 +45,40 @@ go build
 ./Go-Pro
 ```
 
+The server will run on port `8090` by default.
+
 ## Usage
 
-* The server runs on port `8090` by default.
-* Example requests:
+Example endpoints:
+
+* Register a new user:
 
 ```bash
-curl http://localhost:8090/your-endpoint
+POST /user/register
 ```
 
-* Logs will be printed to the console.
+* Login:
+
+```bash
+POST /user/login
+```
+
+* Get user feed:
+
+```bash
+GET /feed
+```
+
+Logs will be printed to the console.
 
 ## Project Structure
 
 ```
 Go-Pro/
 ├── main.go           # Entry point of the application
-├── handler_user.go   # User-related handlers
+├── handler_user.go   # Handles user registration, login
+├── handler_feed.go   # Handles feed endpoints
+├── middleware_auth.go# Authentication middleware
 ├── internal/         # Internal packages (auth, database)
 ├── go.mod
 └── go.sum
